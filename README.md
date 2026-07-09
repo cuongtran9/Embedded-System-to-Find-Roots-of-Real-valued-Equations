@@ -219,9 +219,3 @@ Embedded-System-to-Find-Roots-of-Real-valued-Equations/
 ├── rootpi.py      # Raspberry Pi script (Python)
 └── README.md      # Project documentation
 ```
-
----
-
-## License
-
-This project is developed as part of a graduation thesis (Đồ án tốt nghiệp).
