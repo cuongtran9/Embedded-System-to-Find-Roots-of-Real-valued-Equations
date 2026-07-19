@@ -105,12 +105,12 @@ double evaluate(const char *expr, double x) {
         if(*p == 'x') {
             stack[s_ptr++] = x;
             p++;
-        } else if(isdigit(*p) || *p == '.') {
+        } else if(isdigit((unsigned char)*p) || *p == '.') {
             char *end;
             double num = strtod(p, &end);
             stack[s_ptr++] = num;
             p = end;
-        } else if(isspace(*p)) {
+        } else if(isspace((unsigned char)*p)) {
             p++;
         } else {
             char op = *p++;
@@ -123,7 +123,7 @@ double evaluate(const char *expr, double x) {
                 int prec_prev = (prev_op == '^') ? 3 : ((prev_op == '*' || prev_op == '/') ? 2 : 1);
                 int prec_curr = (op == '^') ? 3 : ((op == '*' || op == '/') ? 2 : 1);
                 if(prec_prev >= prec_curr) {
-                    op_stack[--o_ptr];
+                    --o_ptr;
                     if(s_ptr < 2) return NAN;
                     double b = stack[--s_ptr];
                     double a = stack[--s_ptr];
