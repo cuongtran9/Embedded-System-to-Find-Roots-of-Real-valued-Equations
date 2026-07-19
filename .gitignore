@@ -1,0 +1,31 @@
+# ==============================================================================
+# .gitignore — Equation Solver
+# ==============================================================================
+
+# ESP-IDF build output
+build/
+sdkconfig
+sdkconfig.old
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env/
+
+# Test & CI artifacts
+*.xml
+*.log
+build-report.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

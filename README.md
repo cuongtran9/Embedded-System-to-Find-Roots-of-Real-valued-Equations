@@ -44,7 +44,7 @@ Two hardware platforms are supported:
 |---|---|
 | Microcontroller | ESP32 DevKit |
 | Display | 16×2 I2C LCD (PCF8574, address `0x27`) |
-| Input | 5×4 Matrix Keypad |
+| Input | 4x5 Matrix Keypad |
 | Framework | ESP-IDF with FreeRTOS |
 
 ### Raspberry Pi Version (`rootpi.py`)
@@ -67,7 +67,7 @@ Two hardware platforms are supported:
 | SDA | GPIO 21 |
 | SCL | GPIO 22 |
 
-### ESP32 — 5×4 Keypad
+### ESP32 — 4×5 Keypad
 
 | Function | GPIO Pins |
 |---|---|
@@ -85,7 +85,7 @@ Two hardware platforms are supported:
 
 ## Keypad Layout
 
-### ESP32 (5×4)
+### ESP32 (4×5)
 
 ```
 ┌─────┬─────┬─────┬─────┐
@@ -111,7 +111,7 @@ Two hardware platforms are supported:
 ├─────┼─────┼─────┼─────┤
 │  7  │  8  │  9  │  *  │
 ├─────┼─────┼─────┼─────┤
-│  ^  │  x  │  =  │  .  │  ← '.' to Solve
+│  S  │  x  │  =  │  ^  │  ← 'S' to Solve
 └─────┴─────┴─────┴─────┘
 ```
 
@@ -194,7 +194,7 @@ python rootpi.py
 
 1. Run `python rootpi.py` — terminal shows `Nhập phương trình`
 2. Enter an equation using the keypad (e.g., `x^2=4`)
-3. Press **.** (dot key) to solve
+3. Press **S** (dot key) to solve
 4. Results are printed to the terminal with up to 2 roots
 5. The input is automatically cleared for the next equation
 
@@ -215,7 +215,102 @@ python rootpi.py
 
 ```
 Embedded-System-to-Find-Roots-of-Real-valued-Equations/
-├── root32.c       # ESP32 firmware (C, ESP-IDF/FreeRTOS)
-├── rootpi.py      # Raspberry Pi script (Python)
-└── README.md      # Project documentation
+├── main/                          # ESP32 firmware (ESP-IDF component)
+│   ├── root32.c                   # C source — keypad, LCD, Newton-Raphson solver
+│   └── CMakeLists.txt             # ESP-IDF component registration
+│
+├── raspi/                         # Raspberry Pi
+│   └── rootpi.py                  # Python script — GPIO keypad, multi-root solver
+│
+├── scripts/                       # Python automation
+│   ├── run_tests.py               # Numerical accuracy tests (JUnit XML)
+│   ├── generate_report.py         # Build report generator
+│   └── requirements.txt           # Python dependencies
+│
+├── .github/
+│   └── workflows/ci.yml           # GitHub Actions CI pipeline
+│
+├── CMakeLists.txt                 # ESP-IDF project root config
+├── Makefile                       # GNU Make build system
+├── Dockerfile                     # Reproducible build environment
+├── CHANGELOG.md                   # Version history
+├── .gitignore                     # Git ignore rules
+└── README.md                      # This file
 ```
+
+---
+
+## CI/CD Pipeline
+
+The project uses **GitHub Actions** to automatically test each code push:
+
+```
+┌──────────┐     ┌─────────────────┐     ┌───────────────────┐
+│ Checkout │────►│ 🔍 Lint C Code  │────►│ 🔨 Build ESP32    │
+│ code     │     │ (cppcheck)      │     │ (gcc via ESP-IDF) │
+└──────────┘     └────────┬────────┘     └───────────────────┘
+                          │
+                          ▼
+                 ┌─────────────────┐
+                 │ 🧪 Python Tests │
+                 │ (Newton-Raphson │
+                 │  accuracy)      │
+                 └─────────────────┘
+```
+
+- **Lint:** `cppcheck` static analysis C code
+- **Build:** ESP-IDF compile firmware with `xtensa-esp32-elf-gcc`
+- **Test:** Verify Newton-Raphson solver with known equation
+
+---
+
+## Build Instructions
+
+### Use Make (GNU Make)
+
+```bash
+make all            # Lint + Build + Test
+make build          # Build ESP32 firmware (gcc via ESP-IDF)
+make lint           # Lint C (cppcheck) + Python
+make test           # Run numerical accuracy tests
+make clean          # Remove build artifacts
+make help           # Show all targets
+```
+
+### Use ESP-IDF CLI
+
+```bash
+idf.py build                    # Build firmware
+idf.py -p <PORT> flash monitor  # Flash + serial monitor
+```
+
+### Use Docker
+
+```bash
+docker build -t eq-solver .                        # Build image
+docker run --rm -v $(pwd):/workspace eq-solver make lint   # Lint
+docker run --rm -v $(pwd):/workspace eq-solver make test   # Test
+```
+
+---
+
+## Testing
+
+Numerical accuracy tests verify the Newton-Raphson algorithm:
+
+```bash
+python scripts/run_tests.py
+```
+
+| Test Case | Equation | Expected Roots | Tolerance |
+|-----------|----------|---------------|----------|
+| linear_simple | `2*x+6=0` | -3.0 | 0.01 |
+| quadratic_simple | `x^2=4` | ±2.0 | 0.01 |
+| quadratic_factored | `x^2+3*x-10=0` | -5.0, 2.0 | 0.01 |
+| cubic_simple | `x^3-x=0` | -1.0, 0.0, 1.0 | 0.01 |
+
+---
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) — version history.

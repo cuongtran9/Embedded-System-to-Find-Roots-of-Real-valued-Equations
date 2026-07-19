@@ -19,12 +19,12 @@ for row in rows:
 for col in cols:
     GPIO.setup(col, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# Bản đồ phím mới với '.' và '=' cùng hàng
+# Gán phím mới với 'S' và '=' cùng hàng
 keymap = [
     ['1', '2', '3', '+'],
     ['4', '5', '6', '-'],
     ['7', '8', '9', '*'],
-    ['^', 'x', '=', '.']  # Phím '=' ở [3][2], '.' ở [3][3]
+    ['S', 'x', '=', '^']  # Phím '=' ở [3][2], 'S' ở [3][3]
 ]
 
 def read_key():
@@ -77,12 +77,12 @@ def find_roots(f):
 
 def main():
     equation = ''
-    print("Nhập phương trình (Nhấn / để giải):")
+    print("Nhập phương trình (Nhấn S để giải):")
     try:
         while True:
             key = read_key()
             if key:
-                if key == '.':
+                if key == 'S':
                     print("\nĐang giải phương trình:", equation)
                     try:
                         expr = preprocess_equation(equation)
