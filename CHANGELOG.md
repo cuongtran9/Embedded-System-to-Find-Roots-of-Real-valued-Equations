@@ -6,6 +6,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.1.1]
+
+### Fixed
+- **ESP32 Firmware:** Cast `char` to `unsigned char` for `isdigit()` / `isspace()` — prevents negative array index on signed `char` platforms
+- **ESP32 Firmware:** Remove unused value in operator stack pop (`op_stack[--o_ptr]` → `--o_ptr`)
+- **ESP32 Firmware:** Add `app_main()` entry point — required by ESP-IDF (Arduino framework hides this, ESP-IDF needs it explicitly)
+
+---
+
 ## [1.1.0]
 
 ### Added
